@@ -10,10 +10,10 @@ toDigits digits = reverse $ toDigitsRev digits
 doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther digits = case length digits `mod` 2 of
     0 -> doubleOdd digits
-        where doubleOdd []       = []
+        where doubleOdd []        = []
               doubleOdd (x:y:xs)  = 2*x : y : doubleOdd xs
     1 -> doubleEven digits
-        where doubleEven [x]       = [x]
+        where doubleEven [x]      = [x]
               doubleEven (x:y:xs) = x : 2*y : doubleEven xs
 
 sumDigits :: [Integer] -> Integer
