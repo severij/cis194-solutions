@@ -9,70 +9,50 @@ import Log
 -- I know there are many better ways of doing this, but I think this is enough
 -- at this point of the course ;)
 parseMessage :: String -> LogMessage
-parseMessage str = check $ words str
-    where
-        check (x:y:z:xs) = case x of
-                "E" -> case (ry > 0 && ry < 101) of
-                    True -> case rz > 0 of
-                        True -> LogMessage (Error ry) rz (unwords xs)
-                        _    -> Unknown str
-                    _    -> Unknown str
-                "W" -> case ry > 0 of
-                    True -> LogMessage Warning ry (z ++ " " ++ unwords xs)
-                    _    -> Unknown str
-                "I" -> case ry > 0 of
-                    True -> LogMessage Info ry (z ++ " " ++ unwords xs)
-                    _    -> Unknown str
-                _   -> Unknown str
-            where ry = read y :: Int
-                  rz = read z :: Int
-        check _          = Unknown str
+parseMessage str = case words str of 
+    ("E":s:ts:msg) -> case (read s :: Int) > 0 && (read ts :: Int) < 101 of
+        True -> case (read ts :: Int) > 0 of
+            True -> LogMessage (Error (read s)) (read ts) (unwords msg)
+            _    -> Unknown str
+        _    -> Unknown str
+    ("W":ts:msg)   -> case (read ts :: Int) > 0 of
+        True -> LogMessage Warning (read ts) (unwords msg)
+        _    -> Unknown str
+    ("I":ts:msg)   -> case (read ts :: Int) > 0 of
+        True -> LogMessage Info (read ts) (unwords msg)
+        _    -> Unknown str
+    _              -> Unknown str
         
 parse :: String -> [LogMessage]
 parse fileContents = map parseMessage $ lines fileContents
 
 -- Exercise 2
 
-getTS :: LogMessage -> Int
-getTS (LogMessage (Error _) ts _) = ts
-getTS (LogMessage Warning   ts _) = ts
-getTS (LogMessage Info      ts _) = ts
-getTS (Unknown                 _) = 0
-
 insert :: LogMessage -> MessageTree -> MessageTree
-insert (Unknown _) tree                   = tree
-insert msg         Leaf                   = Node Leaf msg Leaf
-insert msg         (Node left msg2 right) = case getTS msg < getTS msg2 of
-                                                True  -> insert msg left
-                                                False -> insert msg right
+insert (Unknown _) tree = tree
+insert msg         Leaf = Node Leaf msg Leaf
+insert _ tree@(Node _ (Unknown _) _) = tree
+insert m1@(LogMessage _ ts1 _) (Node left m2@(LogMessage _ ts2 _) right)
+    | ts1 > ts2 = Node (insert m1 left) m2 right
+    | otherwise = Node left m2 (insert m1 right)
 
 -- Exercise 3
 
 build :: [LogMessage] -> MessageTree
-build msgs = let build' [] tree = tree
-                 build' (x:xs) tree = build' xs (insert x tree)
-             in build' msgs Leaf
+build = foldr insert Leaf
 
 -- Exercise 4
 
 inOrder :: MessageTree -> [LogMessage]
 inOrder Leaf                  = []
-inOrder (Node Leaf msg Leaf ) = [msg]
-inOrder (Node left msg Leaf ) = inOrder left ++ [msg]
-inOrder (Node Leaf msg right) = [msg] ++ inOrder right
 inOrder (Node left msg right) = inOrder left ++ [msg] ++ inOrder right
 
 -- Exercise 5
 
-getMsg :: LogMessage -> String
-getMsg (LogMessage (Error _) _ msg) = msg
-getMsg (LogMessage Warning   _ msg) = msg
-getMsg (LogMessage Info      _ msg) = msg
-getMsg (Unknown                _  ) = []
-
-getErrS :: LogMessage -> Int
-getErrS (LogMessage (Error s) _ _) = s
-getErrS _                          = -1
-
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong msgs = map getMsg (filter ((>= 50) . getErrS) msgs)
+whatWentWrong msgs = map getMsg $ filter important $ sorted msgs
+    where sorted = inOrder . build
+          important (LogMessage (Error s) _ _) = s >= 50
+          important _ = False
+          getMsg (LogMessage _ _ msg) = msg
+          getMsg _                    = ""
