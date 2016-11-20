@@ -4,10 +4,6 @@ module LogAnalysis where
 
 import Log
 
--- Exercise 1
-
--- I know there are many better ways of doing this, but I think this is enough
--- at this point of the course ;)
 parseMessage :: String -> LogMessage
 parseMessage str = case words str of 
     ("E":s:ts:msg) -> case (read s :: Int) > 0 && (read ts :: Int) < 101 of
@@ -26,8 +22,6 @@ parseMessage str = case words str of
 parse :: String -> [LogMessage]
 parse fileContents = map parseMessage $ lines fileContents
 
--- Exercise 2
-
 insert :: LogMessage -> MessageTree -> MessageTree
 insert (Unknown _) tree = tree
 insert msg         Leaf = Node Leaf msg Leaf
@@ -36,18 +30,12 @@ insert m1@(LogMessage _ ts1 _) (Node left m2@(LogMessage _ ts2 _) right)
     | ts1 > ts2 = Node (insert m1 left) m2 right
     | otherwise = Node left m2 (insert m1 right)
 
--- Exercise 3
-
 build :: [LogMessage] -> MessageTree
 build = foldr insert Leaf
-
--- Exercise 4
 
 inOrder :: MessageTree -> [LogMessage]
 inOrder Leaf                  = []
 inOrder (Node left msg right) = inOrder left ++ [msg] ++ inOrder right
-
--- Exercise 5
 
 whatWentWrong :: [LogMessage] -> [String]
 whatWentWrong msgs = map getMsg $ filter important $ sorted msgs
