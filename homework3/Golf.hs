@@ -11,5 +11,5 @@ localMaxima l = [ l !! n | n <- [0..(length l - 2)], l !! n > l !! (n + 1)]
 histogram :: [Integer] -> String
 histogram l = unlines (map change (chop (count l))) ++"==========\n0123456789\n"
     where count a = [ length (filter (== n) a) | n <- [0..9]]
-          chop b = reverse $ take (maximum b) $ iterate (map ((+) (-1))) b
+          chop b = reverse $ take (maximum b) $ iterate (map pred) b
           change c = map (\x -> if x > 0 then '*' else ' ') c
