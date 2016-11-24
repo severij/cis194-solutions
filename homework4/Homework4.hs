@@ -16,13 +16,14 @@ data Tree a = Leaf
 
 foldTree :: [a] -> Tree a
 foldTree = foldr insert' Leaf
-    where insert' x Leaf = Node 0 Leaf x Leaf
+    where insert' x Leaf  = Node 0 Leaf x Leaf
           insert' x (Node h l y r)
-            | f l > f r = Node h l y (insert' x r)
-            | f l < f r = Node h (insert' x l) y r
-            | otherwise = Node (1 + max (f r) (f (insert' x l))) (insert' x l) y r
-                where f Leaf             = -1
-                      f (Node f' _ _ _) = f'
+              | f l > f r = Node h l y (insert' x r)
+              | f l < f r = Node h (insert' x l) y r
+              | otherwise = Node (1 + max (f r) (f (insert' x l)))
+                                 (insert' x l) y r
+              where f Leaf             = -1
+                    f (Node f' _ _ _) = f'
 
 xor :: [Bool] -> Bool
 xor = foldr1 (/=)
@@ -38,4 +39,4 @@ cartProd xs ys = [(x,y) | x <- xs, y <- ys]
 
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram = map (\x -> 2*x + 1) . (\n -> [1..n] \\ [i+j+2*i*j| i <- [1..n],
-        j <- [1..n], 1 <= i && i <= j, i+j+2*i*j <= n])
+                                j <- [1..n], 1 <= i && i <= j, i+j+2*i*j <= n])

@@ -23,12 +23,12 @@ parse :: String -> [LogMessage]
 parse fileContents = map parseMessage $ lines fileContents
 
 insert :: LogMessage -> MessageTree -> MessageTree
-insert (Unknown _) tree = tree
-insert msg         Leaf = Node Leaf msg Leaf
+insert (Unknown _) tree              = tree
+insert msg         Leaf              = Node Leaf msg Leaf
 insert _ tree@(Node _ (Unknown _) _) = tree
 insert m1@(LogMessage _ ts1 _) (Node left m2@(LogMessage _ ts2 _) right)
-    | ts1 > ts2 = Node (insert m1 left) m2 right
-    | otherwise = Node left m2 (insert m1 right)
+    | ts1 > ts2                      = Node (insert m1 left) m2 right
+    | otherwise                      = Node left m2 (insert m1 right)
 
 build :: [LogMessage] -> MessageTree
 build = foldr insert Leaf

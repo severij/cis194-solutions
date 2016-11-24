@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 toDigitsRev :: Integer -> [Integer]
 toDigitsRev digits
     | digits < 10 = [digits]
@@ -11,9 +13,11 @@ doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther digits = case even $ length digits of
     True  -> doubleOdd digits
         where doubleOdd []        = []
+              doubleOdd [x]       = [2*x]
               doubleOdd (x:y:xs)  = 2*x : y : doubleOdd xs
     False -> doubleEven digits
-        where doubleEven [x]      = [x]
+        where doubleEven []       = []
+              doubleEven [x]      = [x]
               doubleEven (x:y:xs) = x : 2*y : doubleEven xs
 
 sumDigits :: [Integer] -> Integer
@@ -24,6 +28,5 @@ sumDigits (x:xs)
 
 validate :: Integer -> Bool
 validate digits
-    | (sumDigits $ doubleEveryOther $ toDigits digits) `mod` 10
-        == 0    = True
-    | otherwise = False
+    | (sumDigits $ doubleEveryOther $ toDigits digits) `mod` 10 == 0 = True
+    | otherwise                                                      = False

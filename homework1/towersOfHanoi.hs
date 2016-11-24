@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 type Peg = String
 type Move = (Peg, Peg)
 
