@@ -1,5 +1,4 @@
-{- GHC_OPTION -Wall -}
-
+{-# OPTIONS_GHC -Wall #-}
 import Data.List
 
 fun1 :: [Integer] -> Integer
@@ -16,12 +15,12 @@ data Tree a = Leaf
             deriving (Show, Eq)
 
 foldTree :: [a] -> Tree a
-foldTree = foldr insert Leaf
-    where insert x Leaf = Node 0 Leaf x Leaf
-          insert x (Node h l y r)
-            | f l > f r = Node h l y (insert x r)
-            | f l < f r = Node h (insert x l) y r
-            | otherwise = Node (1 + max (f r) (f (insert x l))) (insert x l) y r
+foldTree = foldr insert' Leaf
+    where insert' x Leaf = Node 0 Leaf x Leaf
+          insert' x (Node h l y r)
+            | f l > f r = Node h l y (insert' x r)
+            | f l < f r = Node h (insert' x l) y r
+            | otherwise = Node (1 + max (f r) (f (insert' x l))) (insert' x l) y r
                 where f Leaf             = -1
                       f (Node f' _ _ _) = f'
 
