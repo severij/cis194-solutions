@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 
+-- Exercise 5
 type Peg = String
 type Move = (Peg, Peg)
 

@@ -1,13 +1,16 @@
 {-# OPTIONS_GHC -Wall #-}
 module Golf where
 
+-- Exercise 1
 skips :: [a] -> [[a]]
 skips l = zipWith ($) [ skip x | x <- [1..length l]] $ replicate (length l) l
     where skip n l' = [ y | (x,y) <- zip [1..] l', x `mod` n == 0]
 
+-- Exercise 2
 localMaxima :: [Integer] -> [Integer]
 localMaxima l = [ l !! n | n <- [0..(length l - 2)], l !! n > l !! (n + 1)]
 
+-- Exercise 3
 histogram :: [Integer] -> String
 histogram l = unlines (map change (chop (count l))) ++"==========\n0123456789\n"
     where count a  = [ length (filter (== n) a) | n <- [0..9]]
